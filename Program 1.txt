@@ -1,0 +1,4 @@
+assign a input
+writeFile a awevw
+assign b readFile a
+print b
