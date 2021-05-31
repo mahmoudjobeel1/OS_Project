@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class Main {
-    static HashMap<String,Object> variables=new HashMap<>();
+    static HashMap<String,String> variables=new HashMap<>();
     static Scanner scanner=new Scanner(System.in);
     static  String entered_input;
 
@@ -12,21 +12,21 @@ public class Main {
     // take file name on the form xxxx
     public static String readFile(String path) throws IOException {
         StringBuilder result=new StringBuilder();
-        System.out.println(path);
+        //System.out.println(path);
         try {
             if(variables.containsKey(path)) path=variables.get(path)+"";
             createFile(path);
-            System.out.println(path);
+           // System.out.println(path);
             File file=new File(path+".txt");
             BufferedReader br=new BufferedReader(new FileReader(file));
-            System.out.println(2);
+           // System.out.println(2);
             String st;
             while((st=br.readLine())!=null){
                 if(result.length()!=0) result.append("\n");
                 result.append(st);
             }
         }catch (Exception e){
-            System.out.println("1");
+            System.out.println("error at readFile");
         }
         return result.toString();
     }
@@ -42,20 +42,11 @@ public class Main {
             writer.append(data);
             writer.close();
         }catch (Exception e){
-            System.out.println("wrong file name");
+            System.out.println("error at readFile");
         }
     }
-    public static  void assign(String x,Object y) throws Exception {
-        // objext y always be direct value
-        if(variables.containsKey(x)){
-            if((variables.get(x).getClass().getName()).equals(y.getClass().getName())){
-                variables.put(x,y);
-            }else{
-                throw  new Exception("incorrect  assign data type");
-            }
-        }else{
-            variables.put(x,y);
-        }
+    public static  void assign(String x,String y) throws Exception {
+        variables.put(x,y);
     }
     public static void createFile(String filename){
         try {
@@ -71,9 +62,11 @@ public class Main {
     public static String add(String x,String y) throws Exception {
        int result=0;
        try {
+           String x1=x;
            if(variables.containsKey(x)) x=variables.get(x)+"";
            if(variables.containsKey(y)) y=variables.get(y)+"";
            result=Integer.parseInt(x)+Integer.parseInt(y);
+           variables.put(x1,result+"");
        }catch (Exception e){
            throw new Exception("error in add");
        }
@@ -191,7 +184,7 @@ public class Main {
 //        return "";
 //    }
     public static void run(String path) throws Exception {
-        File file = new File(System.getProperty("user.dir")+"/"+path);
+        File file = new File(System.getProperty("user.dir")+"/"+path+".txt");
         BufferedReader br=new BufferedReader(new FileReader(file));
         String st;
         while((st= br.readLine())!=null){
@@ -201,7 +194,8 @@ public class Main {
     }
     public static void print(String  x)
     {
-        System.out.println(variables.containsKey(x) ? variables.get(x):x);
+        x=variables.containsKey(x) ? variables.get(x):x;
+        System.out.println(x.length()==0 ? "no data entered / empty file":x);
     }
     public static Object input(){
         Scanner sc=new Scanner(System.in);
@@ -215,7 +209,8 @@ public class Main {
         return temp;
     }
     public static void main(String[] args) throws Exception {
-       run("Program 3.txt");
-        System.out.println(variables);
+       for(int i=3;i<=3;i++){
+           run("Program "+i);
+       }
     }
 }
