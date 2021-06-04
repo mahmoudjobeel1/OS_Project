@@ -6,23 +6,23 @@ public class Parser {
 
 
     public static  void assign(String x,String y) throws Exception {
-	if(os.variables.containsKey(y))
-	    y=os.variables.get(y);
-	os.variables.put(x,y);
+	if(os.readMemory(y) != null)
+	    y=os.readMemory(y);
+	os.writeMemory(x,y);
     }
 
     public static String add(String x,String y) throws Exception {
        int result=0;
        try {
            String x1=x;
-           if(os.variables.containsKey(x)) x=os.variables.get(x)+"";
-           if(os.variables.containsKey(y)) y=os.variables.get(y)+"";
+           if(os.readMemory(x) != null) x=os.readMemory(x);
+           if(os.readMemory(y) != null) y=os.readMemory(y);
            result=Integer.parseInt(x)+Integer.parseInt(y);
-           os.variables.put(x1,result+"");
+           os.writeMemory(x1,result+"");
        }catch (Exception e){
            throw new Exception("error in add");
        }
-        return  result+"";
+        return result+"";
     }
 
     public  static  void perform(StringTokenizer line) throws Exception {
@@ -57,8 +57,8 @@ public class Parser {
                          case "readFile" : third=os.readFile(line.nextToken()); break;
                          case "add" : third=add(line.nextToken(),line.nextToken()); break;
                          default:
-                             if(os.variables.containsKey(third))
-                                third=(String) os.variables.get(third);
+                             if(os.readMemory(third) != null)
+                                third=os.readMemory(third);
                              break;
                      }
                      assign(second,third);
@@ -75,8 +75,8 @@ public class Parser {
                     case "readFile" : third=os.readFile(line.nextToken()); break;
                     case "add" : third=add(line.nextToken(),line.nextToken()); break;
                     default:
-                        if(os.variables.containsKey(third))
-                            third=(String) os.variables.get(third);
+                        if(os.readMemory(third) != null)
+                            third=os.readMemory(third);
                         break;
                 }
                 os.writeFile(second,third);

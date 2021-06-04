@@ -11,6 +11,16 @@ public class OS {
         scanner=new Scanner(System.in);
     }
 
+    public String readMemory (String var) {
+        if(variables.containsKey(var))
+            return variables.get(var);
+        return null;
+    }
+
+    public void writeMemory (String var, String val){
+        variables.put(var, val);
+    }
+
     // take file name on the form xxxx
     public String readFile(String path) throws IOException {
         StringBuilder result=new StringBuilder();
@@ -30,7 +40,7 @@ public class OS {
         return result.toString();
     }
 
-    public static void createFile(String filename){
+    public void createFile(String filename){
         try {
             File file = new File(filename+".txt");
             if (file.createNewFile()) {
@@ -57,13 +67,13 @@ public class OS {
         }
     }
 
-    public static void print(String  x)
+    public void print(String  x)
     {
         x=variables.containsKey(x) ? variables.get(x):x;
         System.out.println(x.length()==0 ? "no data entered / empty file":x);
     }
 
-    public static String input(){
+    public String input(){
         Scanner sc=new Scanner(System.in);
         String str=sc.nextLine();
         return str;
