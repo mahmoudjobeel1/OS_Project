@@ -46,7 +46,7 @@ public class Main {
         }
     }
     public static  void assign(String x,String y) throws Exception {
-	if(variables.containsKey(y)) y=if(variables.containsKey(y));
+	if(variables.containsKey(y)) y=variables.get(y);
         variables.put(x,y);
     }
     public static void createFile(String filename){
