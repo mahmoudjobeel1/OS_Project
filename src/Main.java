@@ -4,7 +4,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class Main {
-    static HashMap<String,Object> variables=new HashMap<>();
+    static HashMap<String,String> variables=new HashMap<>();
     static Scanner scanner=new Scanner(System.in);
     static  String entered_input;
 
@@ -12,26 +12,23 @@ public class Main {
     // take file name on the form xxxx
     public static String readFile(String path) throws IOException {
         StringBuilder result=new StringBuilder();
-        System.out.println(path);
         try {
             if(variables.containsKey(path)) path=variables.get(path)+"";
             createFile(path);
-            System.out.println(path);
             File file=new File(path+".txt");
             BufferedReader br=new BufferedReader(new FileReader(file));
-            System.out.println(2);
             String st;
             while((st=br.readLine())!=null){
                 if(result.length()!=0) result.append("\n");
                 result.append(st);
             }
         }catch (Exception e){
-            System.out.println("1");
+            System.out.println("error at readFile");
         }
         return result.toString();
     }
 
-    public static void writeFile(String path,String data){  // path is 1st variable data is 2nd one
+    public static void writeFile(String path,String data){  // path is 1st variable, data is 2nd one
         if(variables.containsKey(path)) path=(String)variables.get(path);
         createFile(path);
         try {
@@ -42,20 +39,12 @@ public class Main {
             writer.append(data);
             writer.close();
         }catch (Exception e){
-            System.out.println("wrong file name");
+            System.out.println("error at readFile");
         }
     }
-    public static  void assign(String x,Object y) throws Exception {
-        // objext y always be direct value
-        if(variables.containsKey(x)){
-            if((variables.get(x).getClass().getName()).equals(y.getClass().getName())){
-                variables.put(x,y);
-            }else{
-                throw  new Exception("incorrect  assign data type");
-            }
-        }else{
-            variables.put(x,y);
-        }
+    public static  void assign(String x,String y) throws Exception {
+	if(variables.containsKey(y)) y=variables.get(y);
+        variables.put(x,y);
     }
     public static void createFile(String filename){
         try {
@@ -71,20 +60,17 @@ public class Main {
     public static String add(String x,String y) throws Exception {
        int result=0;
        try {
+           String x1=x;
            if(variables.containsKey(x)) x=variables.get(x)+"";
            if(variables.containsKey(y)) y=variables.get(y)+"";
            result=Integer.parseInt(x)+Integer.parseInt(y);
+           variables.put(x1,result+"");
        }catch (Exception e){
            throw new Exception("error in add");
        }
         return  result+"";
     }
 
-    // assign a ( add 4 (add 5 7) ) -> assign,a,add,4,add,5,7 -> a,add,4,add,5,7
-
-
-    // add a (assign x print z)
-    // print add 4 5
     public  static  void perform(StringTokenizer line) throws Exception {
         String first=line.nextToken();
 
@@ -102,6 +88,7 @@ public class Main {
             case "readFile":
                 second=line.nextToken();
                 if(second.equals("input")) readFile((String) input());
+                else if (second.equals("add")) readFile(add(line.nextToken(),line.nextToken()));
                 else readFile(second);
                 break;
             case "assign":
@@ -164,34 +151,9 @@ public class Main {
                 break;
         }
     }
-//    public static void perform(StringTokenizer stringTokenizer) throws Exception {
-//        if(!stringTokenizer.hasMoreTokens()) return "";
-//        String temp=stringTokenizer.nextToken();
-//        if(!(temp.equals("print") || temp.equals("assign") || temp.equals("add") || temp.equals("writeFile") || temp.equals("readFile"))){
-//            return temp;
-//        }
-//        // print readfile a
-//        if(temp.equals("print")) print((String) perform(stringTokenizer)); // readfile a
-//        else if(temp.equals("assign")){
-//            Object left=perform(stringTokenizer);
-//            Object right=perform(stringTokenizer);
-//            assign((String) left,right);
-//        }
-//        else if(temp.equals("readFile"))
-//            return readFile((String) perform(stringTokenizer));
-//        else if(temp.equals("add")) {
-//            String left = perform(stringTokenizer);
-//            String right = perform(stringTokenizer);
-//            return add(left, right);
-//        }else if(temp.equals("writeFile")) {
-//            String left = perform(stringTokenizer);
-//            String right = perform(stringTokenizer);
-//            writeFile(left, right);
-//        }
-//        return "";
-//    }
+
     public static void run(String path) throws Exception {
-        File file = new File(System.getProperty("user.dir")+"/"+path);
+        File file = new File(System.getProperty("user.dir")+"/"+path+".txt");
         BufferedReader br=new BufferedReader(new FileReader(file));
         String st;
         while((st= br.readLine())!=null){
@@ -201,21 +163,17 @@ public class Main {
     }
     public static void print(String  x)
     {
-        System.out.println(variables.containsKey(x) ? variables.get(x):x);
+        x=variables.containsKey(x) ? variables.get(x):x;
+        System.out.println(x.length()==0 ? "no data entered / empty file":x);
     }
-    public static Object input(){
+    public static String input(){
         Scanner sc=new Scanner(System.in);
-        String str=sc.next();
-        Object temp=null;
-        try {
-            temp=(Integer)Integer.parseInt(str);
-        }catch (Exception e){
-            temp=str;
-        }
-        return temp;
+        String str=sc.nextLine();
+        return str;
     }
     public static void main(String[] args) throws Exception {
-       run("Program 3.txt");
-        System.out.println(variables);
+       for(int i=1;i<=3;i++){
+           run("Program "+i);
+       }
     }
 }
