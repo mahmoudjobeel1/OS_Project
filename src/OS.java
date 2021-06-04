@@ -68,4 +68,9 @@ public class OS {
         String str=sc.nextLine();
         return str;
     }
+
+    public BufferedReader readProgram (String path) throws FileNotFoundException {
+        File file = new File(System.getProperty("user.dir")+"/"+path+".txt");
+        return new BufferedReader(new FileReader(file));
+    }
 }

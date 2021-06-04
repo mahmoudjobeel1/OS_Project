@@ -4,9 +4,6 @@ import java.util.StringTokenizer;
 public class Parser {
     static OS os;
 
-    public Parser (){
-        os = new OS();
-    }
 
     public static  void assign(String x,String y) throws Exception {
 	if(os.variables.containsKey(y))
@@ -110,8 +107,8 @@ public class Parser {
     }
 
     public static void run(String path) throws Exception {
-        File file = new File(System.getProperty("user.dir")+"/"+path+".txt");
-        BufferedReader br=new BufferedReader(new FileReader(file));
+        os = new OS();
+        BufferedReader br = os.readProgram(path);
         String st;
         while((st= br.readLine())!=null){
             StringTokenizer stringTokenizer=new StringTokenizer(st," ");
@@ -120,9 +117,8 @@ public class Parser {
     }
 
     public static void main(String[] args) throws Exception {
-        Parser p = new Parser();
         for(int i=1;i<=3;i++){
-            p.run("Program "+i);
+            run("Program "+i);
         }
     }
 }
