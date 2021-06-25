@@ -11,10 +11,10 @@ public class Parser {
     public void assign(String x,String y,PCB p) throws Exception {
 	    int s = os.searchMemory(x,p.varStart,p.varEnd);
         if(s == -1) {
-	        if (p.varPC > p.varEnd)
-                throw new Exception("No more space for more variables");
-	        os.writeMemory(x,y,p.varPC);
-	        p.varPC++;
+	      if(p.varStart-1==p.codeEnd){
+	          throw new Exception("there is no more space for this variable");
+          }
+	      os.writeMemory(x,y,--p.varStart);
 	    }
 	    else
 	        os.writeMemory(x,y,s);
@@ -27,6 +27,7 @@ public class Parser {
            if(os.searchMemory(x,p.varStart,p.varEnd) != -1) x=os.readMemory(x,p.varStart,p.varEnd);
            if(os.searchMemory(y,p.varStart,p.varEnd) != -1) y=os.readMemory(y,p.varStart,p.varEnd);
            result=Integer.parseInt(x)+Integer.parseInt(y);
+           // TODO
            assign(x1,result+"",p);
        }catch (Exception e){
            throw new Exception("error in add");
@@ -124,18 +125,23 @@ public class Parser {
     public void create(String path) throws Exception {
         BufferedReader br = os.readProgram(path);
         String st;
-        // enter pcb location
-        PCB pcb = new PCB(os.processes,ProcessState.Ready,0,os.memoryUsed,os.memoryUsed+49,
-                00000, 00000, 00000);
-        os.processes++;
-        int i = 0;
-        while((st= br.readLine())!=null && i<50) {
-            os.writeMemoryProcess(st,pcb.codeStart + i);
-            i++;
+        int pc=os.processes*100+1;
+        int codeStart=pc;
+        int codeEnd=os.processes*100;
+        int pcbLocation=pc-1;
+        int varStart=(os.processes+1)*100;
+        int varEnd=((os.processes+1)*100)-1;
+        if(varEnd>=2000){
+            throw new Exception("No more space for this program");
         }
-        os.memoryUsed += i; // Memory management
-        pcb.codeEnd = os.memoryUsed-1 ; // Memory management
-        // put the PCB in the memory
+        PCB pcb=new PCB(os.processes,ProcessState.NotRunning,pc,codeStart,codeEnd,pcbLocation,varStart,varEnd);
+        while((st=br.readLine())!=null){
+            if(pcb.codeEnd+1==varStart){
+                throw new Exception("No more space for this input instruction");
+            }
+            os.writeMemoryProcess(st,++pcb.codeEnd);
+        }
+        os.processes++;
     }
 
     public void run() {

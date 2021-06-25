@@ -6,13 +6,11 @@ public class OS {
     static Scanner scanner;
     static Object[] memory;
     int processes;
-    int memoryUsed;
 
     public OS (){
         scanner=new Scanner(System.in);
         memory = new Object[2048]; // Memory management
         processes = 0;
-        memoryUsed = 0;
     }
 
     public void writeMemoryProcess (String line, int location) {
@@ -20,7 +18,7 @@ public class OS {
     }
 
     public String readMemory (String var, int varStart, int varEnd) {
-        for(int i=varStart; i<varEnd; i++)
+        for(int i=varStart; i<=varEnd; i++)
             if (((Pair)memory[i]).x != null && (((Pair)memory[i]).x).equals(var))
                 return (String) (((Pair)memory[i]).y);
         return null;
@@ -31,7 +29,7 @@ public class OS {
     }
 
     public int searchMemory (String var, int varStart, int varEnd) {
-        for(int i=varStart; i<varEnd; i++)
+        for(int i=varStart; i<=varEnd; i++)
             if ((((Pair)memory[i]).x).equals(var))
                 return i;
         return -1;
