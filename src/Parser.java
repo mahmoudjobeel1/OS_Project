@@ -2,36 +2,36 @@ import java.io.*;
 import java.util.StringTokenizer;
 
 public class Parser {
-    static OS os;
+    OS os;
 
     public Parser() {
         os = new OS();
     }
 
     public void assign(String x,String y,PCB p) throws Exception {
-	    int s = os.searchMemory(x,p.varStart,p.varEnd);
+        int s = os.searchMemory(x,p.varStart,p.varEnd);
         if(s == -1) {
-	      if(p.varStart-1==p.codeEnd){
-	          throw new Exception("there is no more space for this variable");
-          }
-	      os.writeMemory(x,y,--p.varStart);
-	    }
-	    else
-	        os.writeMemory(x,y,s);
+            if(p.varStart-1==p.codeEnd){
+                throw new Exception("there is no more space for this variable");
+            }
+            os.writeMemory(x,y,--p.varStart);
+        }
+        else
+            os.writeMemory(x,y,s);
     }
 
     public String add(String x,String y,PCB p) throws Exception {
-       int result=0;
-       try {
-           String x1=x;
-           if(os.searchMemory(x,p.varStart,p.varEnd) != -1) x=os.readMemory(x,p.varStart,p.varEnd);
-           if(os.searchMemory(y,p.varStart,p.varEnd) != -1) y=os.readMemory(y,p.varStart,p.varEnd);
-           result=Integer.parseInt(x)+Integer.parseInt(y);
-           // TODO
-           assign(x1,result+"",p);
-       }catch (Exception e){
-           throw new Exception("error in add");
-       }
+        int result=0;
+        try {
+            String x1=x;
+            if(os.searchMemory(x,p.varStart,p.varEnd) != -1) x=os.readMemory(x,p.varStart,p.varEnd);
+            if(os.searchMemory(y,p.varStart,p.varEnd) != -1) y=os.readMemory(y,p.varStart,p.varEnd);
+            result=Integer.parseInt(x)+Integer.parseInt(y);
+            // TODO
+            assign(x1,result+"",p);
+        }catch (Exception e){
+            throw new Exception("error in add");
+        }
         return result+"";
     }
 
@@ -39,20 +39,19 @@ public class Parser {
         String[] Line = line.split(" ");
         String first=Line[0];
 
-        p.processState = ProcessState.Running ;
 
         switch (first){
             case "print":
-                    String second =Line[1];
-                    switch (second){
-                        case "readFile": os.print(os.readFile(Line[2],p)); break;
-                        case "add" :os.print(add(Line[2],Line[3],p)); break;
-                        case "input" : os.print((String) os.input()); break;
-                        default:
-                            if(os.searchMemory(second,p.varStart,p.varEnd) != -1) second=os.readMemory(second,p.varStart,p.varEnd);
-                            os.print(second);
-                    }
-                    break;
+                String second =Line[1];
+                switch (second){
+                    case "readFile": os.print(os.readFile(Line[2],p)); break;
+                    case "add" :os.print(add(Line[2],Line[3],p)); break;
+                    case "input" : os.print((String) os.input()); break;
+                    default:
+                        if(os.searchMemory(second,p.varStart,p.varEnd) != -1) second=os.readMemory(second,p.varStart,p.varEnd);
+                        os.print(second);
+                }
+                break;
             case "input" : os.input(); break;
             case "readFile":
                 second=Line[1];
@@ -61,23 +60,23 @@ public class Parser {
                 else os.readFile(second,p);
                 break;
             case "assign":
-                   // assign input readFile a
-                     second=Line[1];
-                     switch (second){
-                         case "input": second=(String)os.input(); break;
-                     }
-                     String third=Line[2];
-                     switch (third){
-                         case "input": third=os.input()+""; break;
-                         case "readFile" : third=os.readFile(Line[3],p); break;
-                         case "add" : third=add(Line[3],Line[4],p); break;
-                         default:
-                             if(os.searchMemory(third,p.varStart,p.varEnd) != -1)
-                                third=os.readMemory(third,p.varStart,p.varEnd);
-                             break;
-                     }
-                     assign(second,third,p);
-                     break;
+                // assign input readFile a
+                second=Line[1];
+                switch (second){
+                    case "input": second=(String)os.input(); break;
+                }
+                String third=Line[2];
+                switch (third){
+                    case "input": third=os.input()+""; break;
+                    case "readFile" : third=os.readFile(Line[3],p); break;
+                    case "add" : third=add(Line[3],Line[4],p); break;
+                    default:
+                        if(os.searchMemory(third,p.varStart,p.varEnd) != -1)
+                            third=os.readMemory(third,p.varStart,p.varEnd);
+                        break;
+                }
+                assign(second,third,p);
+                break;
             case "writeFile":
                 // writefile
                 second=Line[1];
@@ -136,6 +135,7 @@ public class Parser {
             throw new Exception("No more space for this program");
         }
         PCB pcb=new PCB(os.getProcesses(),ProcessState.NotRunning,codeStart,codeEnd,pcbLocation,varStart,varEnd);
+        os.writeMemoryProcess(pcb,os.getProcesses()*100);
         while((st=br.readLine())!=null){
             if(pcb.codeEnd+1==varStart){
                 throw new Exception("No more space for this input instruction");
@@ -152,8 +152,12 @@ public class Parser {
             for (int process = 0; process < os.getProcesses(); process++) {
                 PCB pcp = (PCB) os.getMemoryOf(process,0) ;
                 for (int i = 0 ; i < 2 ; i ++  ) {
-                    if (pcp.PC <= pcp.instructionsEnd)
-                        perform((String) os.getMemoryOf(process, ++pcp.PC), pcp);
+                    if (pcp.PC <= pcp.instructionsEnd) {
+                        pcp.processState = ProcessState.Running ;
+                        perform((String) os.getMemoryOf(process,pcp.PC), pcp);
+                        pcp.PC ++ ;
+                        pcp.processState = ProcessState.NotRunning;
+                    }
                     else {
                         os.processCompleted();break;
                     }

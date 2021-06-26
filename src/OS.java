@@ -15,7 +15,7 @@ public class OS {
         completedProcesses = 0 ;
     }
 
-    public void writeMemoryProcess (String line, int location) {
+    public void writeMemoryProcess (Object line, int location) {
         memory[location] = line;
     }
 
@@ -101,8 +101,7 @@ public class OS {
     // this method takes the process number and the index within that process and returns the memory object of this address
 
     public Object getMemoryOf(int process , int idx ) throws Exception {
-         if (idx<process*100 || idx>=(process+1)*100)
-            throw new Exception("Access not allowed out of process memory bound");
+
          return memory[process*100+idx];
     }
 
