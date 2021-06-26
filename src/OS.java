@@ -4,13 +4,15 @@ import java.util.Scanner;
 
 public class OS {
     static Scanner scanner;
-    static Object[] memory;
-    int processes;
+    private Object[] memory;
+    private int processes;
+    private int completedProcesses ;
 
     public OS (){
         scanner=new Scanner(System.in);
         memory = new Object[2048]; // Memory management
         processes = 0;
+        completedProcesses = 0 ;
     }
 
     public void writeMemoryProcess (String line, int location) {
@@ -94,5 +96,29 @@ public class OS {
     public BufferedReader readProgram (String path) throws FileNotFoundException {
         File file = new File(System.getProperty("user.dir")+"/"+path+".txt");
         return new BufferedReader(new FileReader(file));
+    }
+
+    // this method takes the process number and the index within that process and returns the memory object of this address
+
+    public Object getMemoryOf(int process , int idx ) throws Exception {
+         if (idx<process*100 || idx>=(process+1)*100)
+            throw new Exception("Access not allowed out of process memory bound");
+         return memory[process*100+idx];
+    }
+
+    public void processCompleted () {
+        completedProcesses ++ ;
+    }
+
+    public boolean allProcessesCompleted () {
+        return completedProcesses == processes ;
+    }
+
+    public int getProcesses() {
+        return processes;
+    }
+
+    public void setProcesses(int processes) {
+        this.processes = processes;
     }
 }

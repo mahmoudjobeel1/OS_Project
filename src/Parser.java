@@ -39,6 +39,8 @@ public class Parser {
         String[] Line = line.split(" ");
         String first=Line[0];
 
+        p.processState = ProcessState.Running ;
+
         switch (first){
             case "print":
                     String second =Line[1];
@@ -125,27 +127,39 @@ public class Parser {
     public void create(String path) throws Exception {
         BufferedReader br = os.readProgram(path);
         String st;
-        int pc=os.processes*100+1;
-        int codeStart=pc;
-        int codeEnd=os.processes*100;
-        int pcbLocation=pc-1;
-        int varStart=(os.processes+1)*100;
-        int varEnd=((os.processes+1)*100)-1;
+        int codeStart=os.getProcesses()*100+1;
+        int codeEnd=os.getProcesses()*100;
+        int pcbLocation=os.getProcesses()*100;
+        int varStart=(os.getProcesses()+1)*100;
+        int varEnd=((os.getProcesses()+1)*100)-1;
         if(varEnd>=2000){
             throw new Exception("No more space for this program");
         }
-        PCB pcb=new PCB(os.processes,ProcessState.NotRunning,pc,codeStart,codeEnd,pcbLocation,varStart,varEnd);
+        PCB pcb=new PCB(os.getProcesses(),ProcessState.NotRunning,codeStart,codeEnd,pcbLocation,varStart,varEnd);
         while((st=br.readLine())!=null){
             if(pcb.codeEnd+1==varStart){
                 throw new Exception("No more space for this input instruction");
             }
             os.writeMemoryProcess(st,++pcb.codeEnd);
+            pcb.instructionsEnd ++ ;
         }
-        os.processes++;
+        os.setProcesses(os.getProcesses()+1);
     }
 
-    public void run() {
+    public void run() throws Exception {
         // put the scheduler code here
+        while (!os.allProcessesCompleted()) {
+            for (int process = 0; process < os.getProcesses(); process++) {
+                PCB pcp = (PCB) os.getMemoryOf(process,0) ;
+                for (int i = 0 ; i < 2 ; i ++  ) {
+                    if (pcp.PC <= pcp.instructionsEnd)
+                        perform((String) os.getMemoryOf(process, ++pcp.PC), pcp);
+                    else {
+                        os.processCompleted();break;
+                    }
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
